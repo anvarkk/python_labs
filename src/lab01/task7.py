@@ -1,12 +1,12 @@
 str_ = str(input())
 
 newstr_ = ''
-index_first = -1
+first = -1
 index_second = -1
 index_last = -1
 
 for i in str_:
-    index_first += 1
+    first += 1
     if i.isupper():
         break
 
@@ -21,8 +21,8 @@ for i in str_:
         break
         
 
-shag = index_second - index_first
+shag = index_second - first
 
-for i in range(index_first, index_last + 1, shag):
+for i in range(first, index_last + 1, shag):
     newstr_ += str_[i]
 print(newstr_)
