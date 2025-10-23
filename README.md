@@ -217,3 +217,74 @@ if __name__ == "__main__":
 
 
 ![Задание 3](images/lab02_task3.png)
+
+
+# Лабораторная Работа 3
+
+
+### Задание 1
+
+### Код
+```python
+import re
+from collections import Counter
+
+def normalize(text: str, *, casefold: bool = True, yo2e: bool = True) -> str:
+    if casefold:
+        text = text.casefold()
+    if yo2e:
+        text = text.replace('ё', 'е').replace('Ё', 'е')
+    text = re.sub(r'[\t\r\n]+', ' ', text)
+    return re.sub(r' +', ' ', text.strip())
+
+def tokenize(text: str) -> list[str]:
+    return re.findall(r'\w+(?:-\w+)*', text)
+
+def count_freq(tokens: list[str]) -> dict[str, int]:
+    return dict(Counter(tokens))
+
+def top_n(freq: dict[str, int], n: int = 5) -> list[tuple[str, int]]:
+    return sorted(freq.items(), key=lambda x: (-x[1], x[0]))[:n]
+
+# Убираем тестовый код или оборачиваем в if __name__
+if __name__ == "__main__":
+    # Тестовый код только при прямом запуске
+    text = "ПрИвЕт\nМИр\tёжик"
+    normalized = normalize(text)
+    tokens = tokenize(normalized)
+    freq = count_freq(tokens)
+    top = top_n(freq, 3)
+
+    print("Нормализовано:", normalized)
+    print("Токены:", tokens)
+    print("Частоты:", freq)
+    print("Топ-3:", top)
+```
+
+![Задание 1](images/lab03_task1.jpg)
+
+### Задание 1
+
+### Код
+```python
+import sys
+from task1 import normalize, tokenize, count_freq, top_n
+
+# Читаем с правильной кодировкой
+text = sys.stdin.buffer.read().decode('utf-8')
+
+normalized_text = normalize(text)
+tokens = tokenize(normalized_text)
+freq = count_freq(tokens)
+
+print(f"Всего слов: {len(tokens)}")
+print(f"Уникальных слов: {len(freq)}")
+print("Топ-5:")
+
+for word, count in top_n(freq, 5):
+    print(f"{word}:{count}") 
+```
+
+![Задание 2](images/lab03_task2.jpg)
+
+
