@@ -288,3 +288,227 @@ for word, count in top_n(freq, 5):
 ![Задание 2](images/lab03_task2.jpg)
 
 
+
+# Лабораторная Работа 4
+
+
+### Задание 1
+
+### Код
+```python
+import csv
+from pathlib import Path
+from typing import Union
+
+def read_text(path: Union[str, Path], encoding: str = "utf-8") -> str:
+    """
+    Читает содержимое текстового файла и возвращает его как одну строку.
+    
+    """
+    with open(path, 'r', encoding=encoding) as file:
+        return file.read()
+
+def write_csv(rows: list[Union[tuple, list]], 
+              path: Union[str, Path], 
+              header: tuple[str, ...] | None = None) -> None:
+    """
+    Создает или перезаписывает CSV файл с разделителем ','.
+    
+    """
+    # Проверяем одинаковую длину всех строк
+    if rows:
+        first_length = len(rows[0])
+        for i, row in enumerate(rows):
+            if len(row) != first_length:
+                raise ValueError(f"Строка {i} имеет длину {len(row)}, ожидалась {first_length}")
+    
+    # Создаем родительские директории если нужно
+    ensure_parent_dir(path)
+    
+    with open(path, 'w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        
+        if header:
+            writer.writerow(header)
+        
+        writer.writerows(rows)
+
+def ensure_parent_dir(path: Union[str, Path]) -> None:
+    """
+    Создает родительские директории для указанного пути, если они не существуют.
+    
+    """
+    path_obj = Path(path)
+    path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+# Мини-тесты для проверки функций
+if __name__ == "__main__":
+    # Тест 1: Чтение текстового файла
+    try:
+        # Создадим тестовый файл для чтения
+        test_input_path = Path("data/input.txt")
+        ensure_parent_dir(test_input_path)
+        with open(test_input_path, 'w', encoding='utf-8') as f:
+            f.write("Тестовый тескт для проверки функций")
+        
+        txt = read_text("data/input.txt")
+        print(f"✓ read_text работает: {txt[:20]}...")
+    except Exception as e:
+        print(f"✗ read_text ошибка: {e}")
+    
+    # Тест 2: Запись CSV
+    try:
+        write_csv([("word", "count"), ("test", 3)], "data/check.csv")
+        print("✓ write_csv с заголовком в данных работает")
+    except Exception as e:
+        print(f"✗ write_csv ошибка: {e}")
+    
+    # Тест 3: Запись CSV с отдельным заголовком
+    try:
+        write_csv([("test", 3), ("example", 1)], "data/check2.csv", header=("word", "count"))
+        print("✓ write_csv с отдельным header работает")
+    except Exception as e:
+        print(f"✗ write_csv с header ошибка: {e}")
+    
+    # Тест 4: Проверка ошибки разной длины строк
+    try:
+        write_csv([("a", "b"), ("c",)], "data/error.csv")
+        print("✗ Должна была быть ошибка разной длины")
+    except ValueError as e:
+        print(f"✓ Корректно обработана ошибка разной длины: {e}")
+    
+    # Тест 5: Пустой файл
+    try:
+        empty_content = read_text("data/empty.txt")
+        print(f"✓ Пустой файл работает: '{empty_content}'")
+    except FileNotFoundError:
+        print("✓ Файл не найден - ожидаемо")
+    except Exception as e:
+        print(f"✗ Ошибка с пустым файлом: {e}")
+    
+    print("\nВсе тесты завершены!")
+    ```
+
+    ![Задание 1](images/lab04_task1.jpg)
+
+
+
+    ### Задание 2
+
+### Код
+```python
+import argparse
+import sys
+from pathlib import Path
+from collections import Counter
+from typing import List, Tuple
+
+# Импортируем функции из task1
+from task1 import read_text, write_csv
+
+def normalize_text(text: str) -> str:
+    """
+    Нормализует текст: приводит к нижнему регистру, заменяет ё на е,
+    заменяет управляющие символы на пробелы, схлопывает пробелы.
+    """
+    if not text:
+        return ""
+    
+    text = text.casefold()
+    text = text.replace('ё', 'е')
+    text = text.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ')
+    
+    # Схлопываем множественные пробелы
+    while '  ' in text:
+        text = text.replace('  ', ' ')
+    
+    return text.strip()
+
+def tokenize(text: str) -> List[str]:
+    """
+    Токенизирует нормализованный текст на слова.
+    """
+    import re
+    if not text:
+        return []
+    
+    # \w+(?:-\w+)* - слова, возможно с дефисами внутри
+    pattern = r'\w+(?:-\w+)*'
+    return re.findall(pattern, text)
+
+def calculate_word_frequencies(tokens: List[str]) -> List[Tuple[str, int]]:
+    """
+    Подсчитывает частоты слов и сортирует по убыванию частоты
+    а при равных частотах по возрастанию слова
+    """
+    if not tokens:
+        return []
+    
+    counter = Counter(tokens)
+    # Сортировка: сначала по убыванию частоты, потом по возрастанию слова
+    return sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+
+def print_summary(tokens: List[str], top_words: List[Tuple[str, int]], top_n: int = 5) -> None:
+    """
+    Выводит краткую статистику в консоль.
+    """
+    total_words = len(tokens)
+    unique_words = len(set(tokens))
+    
+    print(f"Всего слов: {total_words}")
+    print(f"Уникальных слов: {unique_words}")
+    print(f"Топ-{min(top_n, len(top_words))}: {[word for word, count in top_words[:top_n]]}")
+
+def main():
+    """Основная функция скрипта."""
+    parser = argparse.ArgumentParser(description='Анализ текста и генерация отчета о частотах слов')
+    parser.add_argument('--in', dest='input_file', default='data/input.txt',
+                       help='Входной текстовый файл (по умолчанию: data/input.txt)')
+    parser.add_argument('--out', dest='output_file', default='data/report.csv',
+                       help='Выходной CSV файл (по умолчанию: data/report.csv)')
+    parser.add_argument('--encoding', default='utf-8',
+                       help='Кодировка файлов (по умолчанию: utf-8, для Windows: cp1251)')
+    parser.add_argument('--top', type=int, default=5,
+                       help='Количество слов для топа (по умолчанию: 5)')
+    
+    args = parser.parse_args()
+    
+    try:
+        # Чтение входного файла
+        text = read_text(args.input_file, args.encoding)
+        
+        # Обработка текста
+        normalized_text = normalize_text(text)
+        tokens = tokenize(normalized_text)
+        
+        # Подсчет частот
+        word_frequencies = calculate_word_frequencies(tokens)
+        
+        # Сохранение отчета
+        if word_frequencies:
+            write_csv(word_frequencies, args.output_file, header=('word', 'count'))
+        else:
+            # Если слов нет, создаем файл только с заголовком
+            write_csv([], args.output_file, header=('word', 'count'))
+        
+        # Вывод статистики
+        print_summary(tokens, word_frequencies, args.top)
+        
+        print(f"\nОтчет сохранен в: {args.output_file}")
+        
+    except FileNotFoundError:
+        print(f"Ошибка: Файл '{args.input_file}' не найден.")
+        sys.exit(1)
+    except UnicodeDecodeError as e:
+        print(f"Ошибка кодировки: {e}")
+        print("Попробуйте указать правильную кодировку через --encoding (например, --encoding cp1251)")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Неожиданная ошибка: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+    ```
+
+    ![Задание 2](images/lab04_task2.jpg)
