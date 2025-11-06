@@ -387,13 +387,11 @@ if __name__ == "__main__":
         print(f"✗ Ошибка с пустым файлом: {e}")
     
     print("\nВсе тесты завершены!")
-    ```
+```
 
-    ![Задание 1](images/lab04_task1.jpg)
+![Задание 1](images/lab04_task1.jpg)
 
-
-
-    ### Задание 2
+### Задание 2
 
 ### Код
 ```python
@@ -509,6 +507,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-    ```
+```
 
-    ![Задание 2](images/lab04_task2.jpg)
+![Задание 2](images/lab04_task2.jpg)
