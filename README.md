@@ -606,12 +606,19 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
     except Exception as e:
         raise ValueError(f"Ошибка записи JSON: {e}")
 ```
+### json to
 
 ![json to](images/lab05_json.png) 
 
+### csv
+
 ![csv](images/lab05_json_csv.png) 
 
+### and csv to
+
 ![csv to](images/lab05_csv.png)
+
+### json 
 
 ![json](images/lab05_csv_json.png)
 
@@ -680,7 +687,10 @@ def csv_to_xlsx(csv_path: str, xlsx_path: str) -> None:
     except Exception as e:
         raise ValueError(f"Ошибка сохранения XLSX: {e}")
 ```
+### cities.csv to
 
 ![cities.csv to](images/lab05_citycsv.png)
+
+### cities.xlsx
 
 ![cities.xlsx](images/lab05_cityxlsx.jpg)
