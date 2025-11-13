@@ -1,4 +1,3 @@
-# src/lab05/json_csv.py
 import json
 import csv
 from pathlib import Path

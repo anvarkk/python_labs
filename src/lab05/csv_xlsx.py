@@ -1,4 +1,3 @@
-# src/lab05/csv_xlsx.py
 import csv
 from pathlib import Path
 from openpyxl import Workbook
