@@ -607,4 +607,4 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
         raise ValueError(f"Ошибка записи JSON: {e}")
 ```
 
-![Пример работы json to csv](images/lab05_json.jpg)
+![Пример работы json to csv](images/lab05_json.png) (images/lab05_json_csv.png)
