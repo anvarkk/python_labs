@@ -609,7 +609,7 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
 
 ![json to](images/lab05_json.png) 
 
-![csv](images/lab05_json.png) 
+![csv](images/lab05_json_csv.png) 
 
 ![csv to](images/lab05_csv.png)
 
