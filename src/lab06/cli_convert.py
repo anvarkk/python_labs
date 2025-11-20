@@ -1,3 +1,4 @@
+# src/lab06/cli_convert.py
 import argparse
 import sys
 from pathlib import Path
@@ -7,8 +8,11 @@ def json2csv_command(args):
     Конвертация JSON в CSV
     """
     try:
-        # Импортируем функции из lab05
-        from lab05.json_csv import json_to_csv
+        # Добавляем путь к lab05
+        lab05_path = Path(__file__).parent.parent / 'lab05'
+        sys.path.append(str(lab05_path))
+        
+        from json_csv import json_to_csv
         
         # Проверяем существование входного файла
         if not Path(args.infile).exists():
@@ -30,7 +34,10 @@ def csv2json_command(args):
     Конвертация CSV в JSON
     """
     try:
-        from lab05.json_csv import csv_to_json
+        lab05_path = Path(__file__).parent.parent / 'lab05'
+        sys.path.append(str(lab05_path))
+        
+        from json_csv import csv_to_json
         
         if not Path(args.infile).exists():
             raise FileNotFoundError(f"Входной файл не найден: {args.infile}")
@@ -48,7 +55,10 @@ def csv2xlsx_command(args):
     Конвертация CSV в XLSX
     """
     try:
-        from lab05.csv_xlsx import csv_to_xlsx
+        lab05_path = Path(__file__).parent.parent / 'lab05'
+        sys.path.append(str(lab05_path))
+        
+        from csv_xlsx import csv_to_xlsx
         
         if not Path(args.infile).exists():
             raise FileNotFoundError(f"Входной файл не найден: {args.infile}")
