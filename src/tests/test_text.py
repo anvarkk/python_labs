@@ -5,7 +5,7 @@ from pathlib import Path
 # Добавляем путь к src для импорта модулей
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from lab03.text import normalize, tokenize, count_freq, top_n
+from lab03.task1 import normalize, tokenize, count_freq, top_n
 
 def test_normalize_basic():
     """Тест нормализации текста - базовые случаи"""
