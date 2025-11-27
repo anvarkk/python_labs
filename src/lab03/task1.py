@@ -26,11 +26,8 @@ def tokenize(text: str) -> list[str]:
     if not text:
         return []
     
-    # Разбиваем по пробелам
-    words = text.split()
-    
-    # Убираем пустые строки
-    words = [word for word in words if word]
+    # Используем регулярное выражение для извлечения слов (только буквы)
+    words = re.findall(r'[а-яa-zё]+', text)
     
     return words
 
