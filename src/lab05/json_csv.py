@@ -68,8 +68,8 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
             # Читаем первую строку для проверки заголовков
             first_line = csv_file.readline().strip()
             
-            # Проверяем, есть ли запятые в первой строке и выглядит ли она как заголовок
-            if ',' not in first_line or not any(c.isalpha() for c in first_line):
+            # Проверяем, есть ли запятые в первой строке
+            if ',' not in first_line:
                 raise ValueError("CSV файл не содержит заголовков")
             
             # Возвращаемся к началу файла
@@ -77,14 +77,9 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
             
             reader = csv.DictReader(csv_file)
             
-            # Дополнительная проверка наличия заголовков
-            if reader.fieldnames is None or not reader.fieldnames:
+            # Проверка наличия заголовков
+            if reader.fieldnames is None:
                 raise ValueError("CSV файл не содержит заголовков")
-            
-            # Проверяем, что заголовки выглядят как названия полей (содержат буквы)
-            for field in reader.fieldnames:
-                if not any(c.isalpha() for c in str(field)):
-                    raise ValueError("CSV файл не содержит корректных заголовков")
             
             for row in reader:
                 # Все значения сохраняются как строки
