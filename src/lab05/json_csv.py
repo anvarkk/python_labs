@@ -44,7 +44,7 @@ def json_to_csv(json_path: str, csv_path: str) -> None:
             writer.writeheader()
             for item in data:
                 # Заполняем отсутствующие поля пустыми строками
-                row = {key: item.get(key, '') for key in fieldnames}
+                row = {key: str(item.get(key, '')) for key in fieldnames}
                 writer.writerow(row)
     except Exception as e:
         raise ValueError(f"Ошибка записи CSV: {e}")
@@ -65,6 +65,18 @@ def csv_to_json(csv_path: str, json_path: str) -> None:
     # Чтение CSV
     try:
         with open(csv_path, 'r', encoding='utf-8') as csv_file:
+            # Сначала попробуем прочитать первую строку как заголовки
+            first_line = csv_file.readline().strip()
+            if not first_line:
+                raise ValueError("CSV файл пустой")
+            
+            # Проверяем, есть ли запятые в первой строке (признак заголовков)
+            if ',' not in first_line:
+                raise ValueError("CSV файл не содержит заголовков")
+            
+            # Возвращаемся к началу файла
+            csv_file.seek(0)
+            
             reader = csv.DictReader(csv_file)
             
             # Проверка наличия заголовков
