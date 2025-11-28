@@ -910,3 +910,333 @@ if __name__ == '__main__':
 ![xlsx](images/lab06_outxlsx.png)
 
 ![spravka](images/lab06_cliconverthelp.png)
+
+
+# Лабораторная работа 7
+
+### Задание А
+
+```Python
+import pytest
+import sys
+from pathlib import Path
+
+# Добавляем путь к src для импорта модулей
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from lab03.task1 import normalize, tokenize, count_freq, top_n
+
+
+def test_normalize_basic():
+    """Тест нормализации текста - базовые случаи"""
+    # Обычный текст
+    assert normalize("ПРИВЕТ МИР") == "привет мир"
+    assert normalize("Hello World") == "hello world"
+    # Текст с разными регистрами
+    assert normalize("ТеСтОвЫй ТеКсТ") == "тестовый текст"
+
+
+def test_normalize_special_chars():
+    """Тест нормализации - спецсимволы"""
+    # Спецсимволы должны удаляться
+    assert normalize("привет, мир!") == "привет мир"
+    assert normalize("текст... с точками") == "текст с точками"
+    assert normalize("цифры 123 и символы @#$") == "цифры и символы"
+
+
+def test_normalize_empty():
+    """Тест нормализации - граничные случаи"""
+    # Пустая строка
+    assert normalize("") == ""
+    # Только спецсимволы
+    assert normalize("!@#$%") == ""
+
+
+def test_tokenize_basic():
+    """Тест токенизации - базовые случаи"""
+    # Обычный текст
+    assert tokenize("привет мир") == ["привет", "мир"]
+    assert tokenize("hello world") == ["hello", "world"]
+    # Несколько слов
+    assert tokenize("один два три") == ["один", "два", "три"]
+
+
+def test_tokenize_special_chars():
+    """Тест токенизации - спецсимволы"""
+    # Текст со знаками препинания
+    assert tokenize("привет, мир!") == ["привет", "мир"]
+    assert tokenize("текст. с точками") == ["текст", "с", "точками"]
+
+
+def test_tokenize_empty():
+    """Тест токенизации - граничные случаи"""
+    # Пустая строка
+    assert tokenize("") == []
+    # Только спецсимволы
+    assert tokenize("! @ # $") == []
+
+
+def test_count_freq_basic():
+    """Тест подсчета частот - базовые случаи"""
+    # Обычные слова
+    tokens = ["привет", "мир", "привет"]
+    assert count_freq(tokens) == {"привет": 2, "мир": 1}
+
+    # Разные слова
+    tokens = ["один", "два", "три"]
+    assert count_freq(tokens) == {"один": 1, "два": 1, "три": 1}
+
+
+def test_count_freq_repeats():
+    """Тест подсчета частот - повторения"""
+    # Много повторений
+    tokens = ["слово", "слово", "слово", "другое"]
+    assert count_freq(tokens) == {"слово": 3, "другое": 1}
+
+
+def test_count_freq_empty():
+    """Тест подсчета частот - граничные случаи"""
+    # Пустой список
+    assert count_freq([]) == {}
+
+
+def test_top_n_basic():
+    """Тест топ-N слов - базовые случаи"""
+    freq = {"привет": 5, "мир": 3, "тест": 1}
+    # Топ-2
+    assert top_n(freq, 2) == [("привет", 5), ("мир", 3)]
+    # Топ-1
+    assert top_n(freq, 1) == [("привет", 5)]
+
+
+def test_top_n_equal_frequency():
+    """Тест топ-N слов - одинаковая частота (сортировка по алфавиту)"""
+    # При равной частоте сортируем по алфавиту
+    freq = {"яблоко": 3, "апельсин": 3, "банан": 3}
+    result = top_n(freq, 3)
+    assert result == [("апельсин", 3), ("банан", 3), ("яблоко", 3)]
+
+
+def test_top_n_more_than_available():
+    """Тест топ-N слов - запрашиваем больше чем есть"""
+    freq = {"один": 1, "два": 1}
+    # Запрашиваем топ-5, но есть только 2
+
+    assert top_n(freq, 5) == [("два", 1), ("один", 1)]
+
+
+def test_top_n_empty():
+    """Тест топ-N слов - граничные случаи"""
+    # Пустой словарь
+    assert top_n({}, 5) == []
+    # N = 0
+    assert top_n({"слово": 1}, 0) == []
+
+
+# Параметризованные тесты для более полного покрытия
+@pytest.mark.parametrize(
+    "input_text,expected",
+    [
+        ("", ""),
+        ("ПРИВЕТ", "привет"),
+        ("ТеСт", "тест"),
+        ("С Пунктуацией!", "с пунктуацией"),
+    ],
+)
+def test_normalize_parametrized(input_text, expected):
+    """Параметризованный тест нормализации"""
+    assert normalize(input_text) == expected
+
+
+@pytest.mark.parametrize(
+    "tokens,n,expected",
+    [
+        (["а", "б", "в"], 2, [("а", 1), ("б", 1)]),
+        (["а", "а", "б"], 1, [("а", 2)]),
+        ([], 5, []),
+    ],
+)
+def test_top_n_parametrized(tokens, n, expected):
+    """Параметризованный тест топ-N слов"""
+    freq = count_freq(tokens)
+    assert top_n(freq, n) == expected
+```
+
+
+![test_text](images/;ab07_test_text.png)
+
+
+```Python
+import pytest
+import json
+import csv
+import sys
+from pathlib import Path
+
+# Добавляем путь к src для импорта модулей
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from lab05.json_csv import json_to_csv, csv_to_json
+
+
+def test_json_to_csv_basic(tmp_path):
+    """Тест конвертации JSON в CSV - позитивный сценарий"""
+    # Создаем временный JSON файл
+    json_data = [
+        {"name": "Анна", "age": 25, "city": "Москва"},
+        {"name": "Иван", "age": 30, "city": "Санкт-Петербург"},
+    ]
+
+    json_file = tmp_path / "test.json"
+    csv_file = tmp_path / "output.csv"
+
+    with open(json_file, "w", encoding="utf-8") as f:
+        json.dump(json_data, f)
+
+    # Конвертируем
+    json_to_csv(str(json_file), str(csv_file))
+
+    # Проверяем результат
+    assert csv_file.exists()
+
+    with open(csv_file, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+        # Проверяем количество записей
+        assert len(rows) == 2
+        # Проверяем заголовки
+        assert set(rows[0].keys()) == {"age", "city", "name"}
+        # Проверяем данные
+        assert rows[0]["name"] == "Анна"
+        assert rows[0]["age"] == "25"
+        assert rows[1]["city"] == "Санкт-Петербург"
+
+
+def test_csv_to_json_basic(tmp_path):
+    """Тест конвертации CSV в JSON - позитивный сценарий"""
+    # Создаем временный CSV файл
+    csv_file = tmp_path / "test.csv"
+    json_file = tmp_path / "output.json"
+
+    with open(csv_file, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["name", "age", "city"])
+        writer.writeheader()
+        writer.writerow({"name": "Анна", "age": "25", "city": "Москва"})
+        writer.writerow({"name": "Иван", "age": "30", "city": "Санкт-Петербург"})
+
+    # Конвертируем
+    csv_to_json(str(csv_file), str(json_file))
+
+    # Проверяем результат
+    assert json_file.exists()
+
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+        # Проверяем количество записей
+        assert len(data) == 2
+        # Проверяем структуру данных
+        assert data[0]["name"] == "Анна"
+        assert data[0]["age"] == "25"
+        assert data[1]["city"] == "Санкт-Петербург"
+
+
+def test_json_to_csv_missing_fields(tmp_path):
+    """Тест конвертации JSON в CSV - отсутствующие поля"""
+    json_data = [{"name": "Анна", "age": 25}, {"name": "Иван", "city": "Москва"}]
+
+    json_file = tmp_path / "test.json"
+    csv_file = tmp_path / "output.csv"
+
+    with open(json_file, "w", encoding="utf-8") as f:
+        json.dump(json_data, f)
+
+    json_to_csv(str(json_file), str(csv_file))
+
+    with open(csv_file, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+        # Проверяем что все поля есть, даже если некоторые отсутствовали
+        assert set(rows[0].keys()) == {"age", "city", "name"}
+        # Отсутствующие поля должны быть пустыми
+        assert rows[0]["city"] == ""
+        assert rows[1]["age"] == ""
+
+
+def test_json_to_csv_file_not_found():
+    """Тест конвертации JSON в CSV - файл не существует"""
+    with pytest.raises(FileNotFoundError):
+        json_to_csv("nonexistent.json", "output.csv")
+
+
+def test_csv_to_json_file_not_found():
+    """Тест конвертации CSV в JSON - файл не существует"""
+    with pytest.raises(FileNotFoundError):
+        csv_to_json("nonexistent.csv", "output.json")
+
+
+def test_json_to_csv_invalid_json(tmp_path):
+    """Тест конвертации JSON в CSV - некорректный JSON"""
+    json_file = tmp_path / "invalid.json"
+
+    with open(json_file, "w", encoding="utf-8") as f:
+        f.write("это не json")
+
+    with pytest.raises(ValueError, match="Неверный формат JSON"):
+        json_to_csv(str(json_file), "output.csv")
+
+
+def test_json_to_csv_empty_json(tmp_path):
+    """Тест конвертации JSON в CSV - пустой JSON"""
+    json_file = tmp_path / "empty.json"
+
+    with open(json_file, "w", encoding="utf-8") as f:
+        json.dump([], f)
+
+    with pytest.raises(ValueError, match="JSON файл пустой"):
+        json_to_csv(str(json_file), "output.csv")
+
+
+def test_csv_to_json_empty_csv(tmp_path):
+    """Тест конвертации CSV в JSON - пустой CSV (только заголовки)"""
+    csv_file = tmp_path / "empty.csv"
+
+    with open(csv_file, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["name", "age"])
+        writer.writeheader()
+
+    with pytest.raises(ValueError, match="CSV файл пустой"):
+        csv_to_json(str(csv_file), "output.json")
+
+
+def test_csv_to_json_no_headers(tmp_path):
+    """Тест конвертации CSV в JSON - нет заголовков"""
+    csv_file = tmp_path / "no_headers.csv"
+
+    # Создаем CSV файл без заголовков, где первая строка содержит только числа
+
+    with open(csv_file, "w", encoding="utf-8", newline="") as f:
+        f.write("25,30\n")  # Только числа - не похоже на заголовки
+        f.write("35,40\n")
+
+    # Ожидаем, что функция выбросит ValueError
+    with pytest.raises(ValueError, match="CSV файл не содержит заголовков"):
+        csv_to_json(str(csv_file), "output.json")
+
+```
+
+![test_json2csv](images/lab07_test_json2csv.png)
+
+### Проверка форматирования black 
+![black](images/lab07_bez_format.png)
+
+### Форматирование black
+![black_run](images/lab07_format.png)
+
+### Проверка результатов форматирования
+![black_test](images/lab07_proverka_format.png)
+
+### Покрытие кода
+![cover](images/lab07_cover.png)
