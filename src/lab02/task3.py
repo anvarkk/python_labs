@@ -2,6 +2,7 @@
 
 from typing import Tuple
 
+
 def format_record(rec: Tuple[str, str, float]) -> str:
     if not isinstance(rec, tuple) or len(rec) != 3:
         raise TypeError("record must be tuple (fio, group, gpa)")
@@ -44,4 +45,3 @@ if __name__ == "__main__":
             print(f"{rec!r} -> {out!r}")
         except Exception as e:
             print(f"{rec!r} -> {type(e).__name__}: {e}")
-

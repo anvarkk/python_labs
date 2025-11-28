@@ -17,7 +17,7 @@ length = len(fio_cleaned)
 words = fio_cleaned.split()
 
 # Формируем инициалы: берем первый символ каждого слова и переводим в верхний регистр
-initials = ''.join([word[0].upper() for word in words])
+initials = "".join([word[0].upper() for word in words])
 
 # Выводим результат
 print(f"Инициалы: {initials}.")

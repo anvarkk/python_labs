@@ -5,12 +5,12 @@
 n = int(input())  # Читаем количество участников
 
 count_onsite = 0  # Счетчик очников
-count_online = 0   # Счетчик заочников
+count_online = 0  # Счетчик заочников
 
 for _ in range(n):
     line = input().split()  # Разбиваем строку на части
-    format_str = line[-1]   # Берем последний элемент (формат обучения)
-    
+    format_str = line[-1]  # Берем последний элемент (формат обучения)
+
     if format_str == "True":  # Если очный формат
         count_onsite += 1
     else:  # Если заочный формат

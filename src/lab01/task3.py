@@ -9,9 +9,9 @@ total = base + vat_amount
 """
 
 # Получаем ввод от пользователя
-price_input = input("price: ").replace(',', '.')
-discount_input = input("discount (%): ").replace(',', '.')
-vat_input = input("vat (%): ").replace(',', '.')
+price_input = input("price: ").replace(",", ".")
+discount_input = input("discount (%): ").replace(",", ".")
+vat_input = input("vat (%): ").replace(",", ".")
 
 # Преобразуем в вещественные числа
 price = float(price_input)
@@ -19,8 +19,8 @@ discount = float(discount_input)
 vat = float(vat_input)
 
 # Вычисляем по формулам
-base = price * (1 - discount/100)
-vat_amount = base * (vat/100)
+base = price * (1 - discount / 100)
+vat_amount = base * (vat / 100)
 total = base + vat_amount
 
 # Форматируем вывод с двумя знаками после запятой и символом рубля

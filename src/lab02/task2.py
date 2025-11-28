@@ -4,6 +4,7 @@ from typing import List, Union
 
 Number = Union[int, float]
 
+
 def _check_rect(mat: List[List[Number]]):
     if not mat:
         return
@@ -12,6 +13,7 @@ def _check_rect(mat: List[List[Number]]):
         if len(row) != n:
             raise ValueError("рваная матрица")
 
+
 def transpose(mat: List[List[Number]]) -> List[List[Number]]:
     if not mat:
         return []
@@ -19,15 +21,18 @@ def transpose(mat: List[List[Number]]) -> List[List[Number]]:
     # zip(*mat) даёт колонки; превращаем в списки
     return [list(col) for col in zip(*mat)]
 
+
 def row_sums(mat: List[List[Number]]) -> List[Number]:
     _check_rect(mat)
     return [sum(row) for row in mat]
+
 
 def col_sums(mat: List[List[Number]]) -> List[Number]:
     _check_rect(mat)
     if not mat:
         return []
     return [sum(col) for col in zip(*mat)]
+
 
 if __name__ == "__main__":
     cases = [
@@ -36,12 +41,10 @@ if __name__ == "__main__":
         ("transpose", [[1, 2], [3, 4]]),
         ("transpose", []),
         ("transpose", [[1, 2], [3]]),
-
         ("row_sums", [[1, 2, 3], [4, 5, 6]]),
         ("row_sums", [[-1, 1], [10, -10]]),
         ("row_sums", [[0, 0], [0, 0]]),
         ("row_sums", [[1, 2], [3]]),
-
         ("col_sums", [[1, 2, 3], [4, 5, 6]]),
         ("col_sums", [[-1, 1], [10, -10]]),
         ("col_sums", [[0, 0], [0, 0]]),
@@ -61,4 +64,3 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"{inp!r} -> {type(e).__name__}: {e}")
         print()
-
