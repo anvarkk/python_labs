@@ -141,8 +141,12 @@ def test_csv_to_json_no_headers(tmp_path):
     """Тест конвертации CSV в JSON - нет заголовков"""
     csv_file = tmp_path / "no_headers.csv"
     
+    # Создаем CSV файл без заголовков, где первая строка содержит только числа
+
     with open(csv_file, 'w', encoding='utf-8', newline='') as f:
-        f.write("Анна,25\nИван,30\n")
+        f.write("25,30\n")  # Только числа - не похоже на заголовки
+        f.write("35,40\n")
     
+    # Ожидаем, что функция выбросит ValueError
     with pytest.raises(ValueError, match="CSV файл не содержит заголовков"):
         csv_to_json(str(csv_file), "output.json")
