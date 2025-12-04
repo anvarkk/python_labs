@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List
-from .models import Student
+from models import Student
 
 def students_to_json(students: List[Student], path: str) -> None:
     """
